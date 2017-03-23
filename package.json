@@ -1,0 +1,27 @@
+{
+  "name": "captcha-clientside-workflow",
+  "version": "0.0.1",
+  "description": "BotDetect Captcha Client side workflow",
+  "scripts": {
+    "build": "grunt"  
+  },
+  "main": "dist/captcha-clientside-workflow.min.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/captcha-com/captcha-clientside-workflow.git"
+  },
+  "homepage": "https://captcha.com",
+  "keywords": [
+    "captcha",
+    "botdetect"
+  ],
+  "author": "BotDetect Captcha",
+  "bugs": {
+    "url": "https://captcha.com/support"
+  },
+  "devDependencies": {
+    "grunt": "^1.0.1",
+    "grunt-contrib-uglify": "^2.2.0"
+  },
+  "dependencies": {}
+}

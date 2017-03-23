@@ -1,0 +1,17 @@
+{
+  "name": "captcha-clientside-workflow",
+  "version": "0.0.1",
+  "homepage": "https://captcha.com",
+  "authors": [
+    "BotDetect Captcha"
+  ],
+  "description": "BotDetect Captcha Client side workflow",
+  "main": "dist/captcha-clientside-workflow.min.js",
+  "keywords": [
+    "captcha",
+    "botdetect"
+  ],
+  "ignore": [
+    "bower_components"
+  ]
+}
