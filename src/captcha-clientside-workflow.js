@@ -1,7 +1,8 @@
 (function(window) {
   'use strict';
   
-  var document = window.document;
+  var document = window.document,
+      bodyElement = document.body || document.getElementsByTagName('body')[0];
   
   var defaultSettings = {
     captchaEndpoint: '' // e.g. '/user-app/botdetectcaptcha' or '/user-app/simplebotdetect.php' or '/user-app/BotDetectCaptcha.ashx'
@@ -78,7 +79,7 @@
       get: 'script-include'
     });
 
-    document.body.append(captchaHelper.scriptInclude(url, 'BDC_ScriptInclude'));
+    bodyElement.append(captchaHelper.scriptInclude(url, 'BDC_ScriptInclude'));
   }
 
   // Add BotDetect init script include to body element.
@@ -102,8 +103,6 @@
       t: captchaId.value,
       cs: '2'
     });
-
-    var bodyElement = document.body || document.getElementsByTagName('body')[0];
 
     bodyElement.append(captchaHelper.scriptInclude(initScriptIncludeUrl, 'BDC_InitScriptInclude'));
   }
@@ -163,7 +162,6 @@
         window['bdc_clientside_style_name'] = captchaStyleName;
 
         addScriptToBody(settings.captchaEndpoint);
-
         showHtml(captchaStyleName, bdcElement, settings.captchaEndpoint);
       }
     };
