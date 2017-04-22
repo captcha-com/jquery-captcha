@@ -42,8 +42,8 @@
     }
   };
 
-  // Captcha helper that provides useful functions.
-  var captchaHelper = {
+  // The common functions that will be shared to other javascript frameworks.
+  var commonFunctions = {
     // build url with parameters
     buildUrl: function(url, params) {
       var p = [];
@@ -64,53 +64,54 @@
           script.src = url;
           script.className = className;
       return script;
+    },
+
+    // Add BotDetect client-side script include to body element.
+    addScriptToBody: function(captchaEndpoint) {
+      if (document.getElementsByClassName('BDC_ScriptInclude').length !== 0) {
+        // BotDetect client-side script is already added
+        return;
+      }
+
+      // build BotDetect client-side script include url
+      var url = this.buildUrl(captchaEndpoint, {
+        get: 'script-include'
+      });
+
+      bodyElement.append(this.scriptInclude(url, 'BDC_ScriptInclude'));
+    },
+
+    // Add BotDetect init script include to body element.
+    addInitScriptToBody: function(captchaStyleName, captchaEndpoint) {
+      // remove included BotDetect init script if it exists
+      var initScriptIncluded = document.getElementsByClassName('BDC_InitScriptInclude');
+      if (initScriptIncluded.length !== 0) {
+        initScriptIncluded[0].parentNode.removeChild(initScriptIncluded[0]);
+      }
+
+      var captchaId = document.getElementById('BDC_VCID_' + captchaStyleName);
+
+      if (!captchaId) {
+        return;
+      }
+
+      // build BotDetect init script include url.
+      var initScriptIncludeUrl = this.buildUrl(captchaEndpoint, {
+        get: 'init-script-include',
+        c: captchaStyleName,
+        t: captchaId.value,
+        cs: '2'
+      });
+
+      bodyElement.append(this.scriptInclude(initScriptIncludeUrl, 'BDC_InitScriptInclude'));
     }
+
   };
 
-  // Add BotDetect client-side script include to body element.
-  function addScriptToBody(captchaEndpoint) {
-    if (document.getElementsByClassName('BDC_ScriptInclude').length !== 0) {
-      // BotDetect client-side script is already added
-      return;
-    }
-
-    // build BotDetect client-side script include url
-    var url = captchaHelper.buildUrl(captchaEndpoint, {
-      get: 'script-include'
-    });
-
-    bodyElement.append(captchaHelper.scriptInclude(url, 'BDC_ScriptInclude'));
-  }
-
-  // Add BotDetect init script include to body element.
-  function addInitScriptToBody(captchaStyleName, captchaEndpoint) {
-     // remove included BotDetect init script if it exists
-    var initScriptIncluded = document.getElementsByClassName('BDC_InitScriptInclude');
-    if (initScriptIncluded.length !== 0) {
-      initScriptIncluded[0].parentNode.removeChild(initScriptIncluded[0]);
-    }
-
-    var captchaId = document.getElementById('BDC_VCID_' + captchaStyleName);
-
-    if (!captchaId) {
-      return;
-    }
-
-    // build BotDetect init script include url.
-    var initScriptIncludeUrl = captchaHelper.buildUrl(captchaEndpoint, {
-      get: 'init-script-include',
-      c: captchaStyleName,
-      t: captchaId.value,
-      cs: '2'
-    });
-
-    bodyElement.append(captchaHelper.scriptInclude(initScriptIncludeUrl, 'BDC_InitScriptInclude'));
-  }
-  
   // Display captcha html markup in view.
   function showHtml(captchaStyleName, bdcElement, captchaEndpoint) {
     // build captcha html url
-    var captchaHtmlUrl = captchaHelper.buildUrl(captchaEndpoint, {
+    var captchaHtmlUrl = commonFunctions.buildUrl(captchaEndpoint, {
       get: 'html',
       c: captchaStyleName
     });
@@ -118,7 +119,7 @@
     ajax.get(captchaHtmlUrl, function(response) {
       if (response.status === 200) {
         bdcElement.innerHTML = response.responseText.replace(/<script.*<\/script>/g, '');
-        addInitScriptToBody(captchaStyleName, captchaEndpoint);
+        commonFunctions.addInitScriptToBody(captchaStyleName, captchaEndpoint);
       } else {
         throw new Error('Can not load captcha html');
       }
@@ -161,7 +162,7 @@
         // save captchaStyleName in window object, that will be used in Captcha.getInstance() for getting BotDetect instance
         window['bdc_clientside_style_name'] = captchaStyleName;
 
-        addScriptToBody(settings.captchaEndpoint);
+        commonFunctions.addScriptToBody(settings.captchaEndpoint);
         showHtml(captchaStyleName, bdcElement, settings.captchaEndpoint);
       }
     };
@@ -173,7 +174,7 @@
     if (!savedCaptchaStyleName) {
       return null;
     }
-    
+
     return BotDetect.getInstanceByStyleName(savedCaptchaStyleName);
   };
  
