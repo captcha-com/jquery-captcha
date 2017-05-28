@@ -214,7 +214,6 @@
 
     if (!captcha) {
       throw new Error('BotDetect Captcha client-side instance does not exist.');
-      return;
     }
     
     var captchaCode = captcha.userInput.value.trim();
