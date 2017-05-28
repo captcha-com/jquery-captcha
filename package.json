@@ -1,7 +1,7 @@
 {
   "name": "captcha-clientside-workflow",
-  "version": "0.0.1",
-  "description": "BotDetect Captcha Client side workflow",
+  "version": "1.0.0",
+  "description": "BotDetect Captcha Client side workflow (pure JavaScript / JQuery)",
   "scripts": {
     "build": "grunt"  
   },
