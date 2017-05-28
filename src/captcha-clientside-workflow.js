@@ -15,31 +15,55 @@
     };
   }
   
-  // Ajax helper.
-  var ajax = {
-    xhr: function() {
-      var x = null;
-      try { x = new XMLHttpRequest(); return x; } catch (e) {}
-      try { x = new ActiveXObject('MSXML2.XMLHTTP.5.0'); return x; } catch (e) {}
-      try { x = new ActiveXObject('MSXML2.XMLHTTP.4.0'); return x; } catch (e) {}
-      try { x = new ActiveXObject('MSXML2.XMLHTTP.3.0'); return x; } catch (e) {}
-      try { x = new ActiveXObject('MSXML2.XMLHTTP'); return x; } catch (e) {}
-      try { x = new ActiveXObject('Microsoft.XMLHTTP'); return x; } catch (e) {}
-      return x;
+  // Helper functions
+  var helpers = {
+    extend: function(configuredSettings, defaultSettings) {
+      var settings = {};
+      for (var key in defaultSettings) {
+        var settingValue = configuredSettings[key];
+        settings[key] = (typeof settingValue === 'undefined') ? defaultSettings[key] : settingValue;
+      }
+      return settings;
     },
     
-    get: function(url, callback) {
-      var xhr = this.xhr();
-      if (xhr && xhr.readyState === 0) {
-        xhr.onreadystatechange = function() {
-          if (xhr.readyState === 4) {
-            callback(xhr);
-          }
-        };
-        xhr.open('GET', url, true);
-        xhr.send();
+    // ajax helper
+    ajax: {
+      xhr: function() {
+        var x = null;
+        try { x = new XMLHttpRequest(); return x; } catch (e) {}
+        try { x = new ActiveXObject('MSXML2.XMLHTTP.5.0'); return x; } catch (e) {}
+        try { x = new ActiveXObject('MSXML2.XMLHTTP.4.0'); return x; } catch (e) {}
+        try { x = new ActiveXObject('MSXML2.XMLHTTP.3.0'); return x; } catch (e) {}
+        try { x = new ActiveXObject('MSXML2.XMLHTTP'); return x; } catch (e) {}
+        try { x = new ActiveXObject('Microsoft.XMLHTTP'); return x; } catch (e) {}
+        return x;
+      },
+
+      get: function(url, callback) {
+        var xhr = this.xhr();
+        if (xhr && xhr.readyState === 0) {
+          xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4) {
+              callback(xhr);
+            }
+          };
+          xhr.open('GET', url, true);
+          xhr.send();
+        }
       }
+    },
+    
+    parseJson: function(jsonString) {
+      var resultObj = null;
+      if (typeof(JSON) !== 'undefined' && typeof(JSON.parse) === 'function') {
+        resultObj = JSON.parse(jsonString);
+      }
+      if (!resultObj) {
+        resultObj = eval('(' + jsonString + ')');
+      }
+      return resultObj;
     }
+    
   };
 
   // The common functions that will be shared to other javascript frameworks.
@@ -109,63 +133,114 @@
   };
 
   // Display captcha html markup in view.
-  function showHtml(captchaStyleName, bdcElement, captchaEndpoint) {
+  function displayHtml(settings) {
+    // get botdetect-captcha element for showing captcha html
+    var bdcElements = document.getElementsByClassName('botdetect-captcha');
+
+    if (bdcElements.length === 0) {
+      return;
+    }
+
+    // we currently support only one captcha on a page
+    var bdcElement = bdcElements[0];
+
+    // captcha style name
+    var captchaStyleName = bdcElement.getAttribute('data-stylename');
+
+    if (!captchaStyleName) {
+      captchaStyleName = 'defaultCaptcha';
+    }
+
+    // save captchaStyleName in window object, that will be used in Captcha.getInstance() for getting BotDetect instance
+    window['bdc_clientside_style_name'] = captchaStyleName;
+
     // build captcha html url
-    var captchaHtmlUrl = commonFunctions.buildUrl(captchaEndpoint, {
+    var captchaHtmlUrl = commonFunctions.buildUrl(settings.captchaEndpoint, {
       get: 'html',
       c: captchaStyleName
     });
 
-    ajax.get(captchaHtmlUrl, function(response) {
+    helpers.ajax.get(captchaHtmlUrl, function(response) {
       if (response.status === 200) {
+        // display Captcha html
         bdcElement.innerHTML = response.responseText.replace(/<script.*<\/script>/g, '');
-        commonFunctions.addInitScriptToBody(captchaStyleName, captchaEndpoint);
+        
+        // add BotDetect Init script to body
+        commonFunctions.addInitScriptToBody(captchaStyleName, settings.captchaEndpoint);
       } else {
-        throw new Error('Can not load captcha html');
+        throw new Error('An error occurred while getting Captcha html markup.');
       }
     });
   }
   
+  // Captcha client-side object.
   var Captcha = Captcha || {};
   
-  Captcha.init = function(configuredSettings) {
-    var settings = {};
-    configuredSettings = configuredSettings || {};
-    for (var key in defaultSettings) {
-      var settingValue = configuredSettings[key];
-      settings[key] = (typeof settingValue === 'undefined') ? defaultSettings[key] : settingValue;
-    }
+  Captcha.config = function(configuredSettings) {
+    var settings = helpers.extend(configuredSettings || {}, defaultSettings);
 
     // remove the '/' last char of url if it exists
     settings.captchaEndpoint = settings.captchaEndpoint.replace(/\/+$/i, '');
-
-    // show captcha html on DOM content loaded
-    document.onreadystatechange = function () {
-      if (document.readyState === "complete") {
-        // get botdetect-captcha element for showing captcha html
-        var bdcElements = document.getElementsByClassName('botdetect-captcha');
-
-        if (bdcElements.length === 0) {
-          return;
-        }
-        
-        // we currently support only one captcha on a page
-        var bdcElement = bdcElements[0];
-        
-        // captcha style name
-        var captchaStyleName = bdcElement.getAttribute('data-stylename');
-
-        if (!captchaStyleName) {
-          captchaStyleName = 'defaultCaptcha';
-        }
     
-        // save captchaStyleName in window object, that will be used in Captcha.getInstance() for getting BotDetect instance
-        window['bdc_clientside_style_name'] = captchaStyleName;
+    // display captcha html markup on the view
+    Captcha.init(settings);
+  };
+  
+  Captcha.init = function(settings) {
+    // add BotDetect script to body before displaying Captcha html
+    commonFunctions.addScriptToBody(settings.captchaEndpoint);
+    Captcha.displayHtml(settings);
+  };
+  
+  Captcha.displayHtml = function(settings) {
+    // display Captcha htmt markup when DOM content is loaded
+    if (document.readyState === 'complete') {
+      displayHtml(settings);
+    } else {
+      document.onreadystatechange = function() {
+        if (document.readyState === "complete") {
+          displayHtml(settings);
+        }
+      };
+    }
+  };
+  
+  // Perform UI captcha validation.
+  // It will be invoked on blur event by user.
+  Captcha.validate = function(callback) {
+    var isCorrectCaptcha = false;
+    
+    var captcha = Captcha.getInstance();
 
-        commonFunctions.addScriptToBody(settings.captchaEndpoint);
-        showHtml(captchaStyleName, bdcElement, settings.captchaEndpoint);
+    if (!captcha) {
+      throw new Error('BotDetect Captcha client-side instance does not exist.');
+      return;
+    }
+    
+    var captchaCode = captcha.userInput.value.trim();
+
+    if (captchaCode.length < 1) {
+      return;
+    }
+
+    var validationUrl = captcha.validationUrl + '&i=' + captchaCode;
+
+    helpers.ajax.get(validationUrl, function(response) {
+      if (response.status === 200) {
+        isCorrectCaptcha = helpers.parseJson(response.responseText);
+        
+        // invoke user callback function and fire the validation result through the parameter.
+        // so user can use it for either displaying messages or checking captcha code input field status when form is submitted
+        callback(isCorrectCaptcha);
+        
+        // reload captcha image when validation failed
+        if (!isCorrectCaptcha) {
+          captcha.reloadImage();
+        }
+      } else {
+        throw new Error('An error occurred while validating Captcha.');
       }
-    };
+    });
   };
   
   Captcha.getInstance = function() {
@@ -177,6 +252,6 @@
 
     return BotDetect.getInstanceByStyleName(savedCaptchaStyleName);
   };
- 
+  
   window.Captcha = Captcha;
 }(window));
