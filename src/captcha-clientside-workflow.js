@@ -64,7 +64,7 @@
       return resultObj;
     },
     
-    // get configured base url thougth captcha html
+    // get configured base url in captcha html
     getBaseUrl: function(captchaHtml) {
       var baseUrl = '';
       var matched = captchaHtml.match(/id=['"]BDC_BaseUrl['"].*value=['"]([^'"]+)/);
