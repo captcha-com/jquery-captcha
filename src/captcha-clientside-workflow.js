@@ -62,18 +62,7 @@
         resultObj = eval('(' + jsonString + ')');
       }
       return resultObj;
-    },
-    
-    // get configured base url in captcha html
-    getBaseUrl: function(captchaHtml) {
-      var baseUrl = '';
-      var matched = captchaHtml.match(/id=['"]BDC_BaseUrl['"].*value=['"]([^'"]+)/);
-      if (matched) {
-        baseUrl = matched[1];
-      }
-      return baseUrl;
     }
-    
   };
 
   // The common functions that will be shared to other javascript frameworks.
@@ -93,48 +82,30 @@
     },
 
     // create script include element
-    scriptInclude: function(url, className, onLoadedCallback) {
+    scriptInclude: function(url, className) {
       var script = document.createElement('script');
           script.src = url;
           script.className = className;
-      
-      if (script.readyState) { // for IE
-        script.onreadystatechange = function() {
-          if ((script.readyState === 'loaded') 
-                || (script.readyState === 'complete')) {
-            if (typeof onLoadedCallback === 'function') {
-              onLoadedCallback();
-            }
-          }
-        };
-      } else {
-        script.onload = function() {
-          if (typeof onLoadedCallback === 'function') {
-              onLoadedCallback();
-            }
-        };
-      }
-      
       return script;
     },
 
     // Add BotDetect client-side script include to body element.
-    addScriptToBody: function(captchaEndpoint, baseUrl, callback) {
+    addScriptToBody: function(captchaEndpoint) {
       if (document.getElementsByClassName('BDC_ScriptInclude').length !== 0) {
         // BotDetect client-side script is already added
         return;
       }
 
       // build BotDetect client-side script include url
-      var url = this.buildUrl(baseUrl + captchaEndpoint, {
+      var url = this.buildUrl(captchaEndpoint, {
         get: 'script-include'
       });
       
-      bodyElement.appendChild(this.scriptInclude(url, 'BDC_ScriptInclude', callback));
+      bodyElement.appendChild(this.scriptInclude(url, 'BDC_ScriptInclude'));
     },
 
     // Add BotDetect init script include to body element.
-    addInitScriptToBody: function(captchaStyleName, captchaEndpoint, baseUrl, callback) {
+    addInitScriptToBody: function(captchaStyleName, captchaEndpoint) {
       // remove included BotDetect init script if it exists
       var initScriptIncluded = document.getElementsByClassName('BDC_InitScriptInclude');
       if (initScriptIncluded.length !== 0) {
@@ -148,16 +119,15 @@
       }
 
       // build BotDetect init script include url.
-      var initScriptIncludeUrl = this.buildUrl(baseUrl + captchaEndpoint, {
+      var initScriptIncludeUrl = this.buildUrl(captchaEndpoint, {
         get: 'init-script-include',
         c: captchaStyleName,
         t: captchaId.value,
         cs: '2'
       });
 
-      bodyElement.appendChild(this.scriptInclude(initScriptIncludeUrl, 'BDC_InitScriptInclude', callback));
+      bodyElement.appendChild(this.scriptInclude(initScriptIncludeUrl, 'BDC_InitScriptInclude'));
     }
-
   };
 
   // Display captcha html markup in view.
@@ -190,17 +160,11 @@
 
     helpers.ajax.get(captchaHtmlUrl, function(response) {
       if (response.status === 200) {
-        var captchaHtml = response.responseText;
-        var baseUrl = helpers.getBaseUrl(captchaHtml);
+        // display Captcha html
+        bdcElement.innerHTML = response.responseText.replace(/<script.*<\/script>/g, '');
         
-        var callback = function() {
-          bdcElement.innerHTML = captchaHtml.replace(/<script.*<\/script>/g, '');
-          // add BotDetect Init script to body
-          commonFunctions.addInitScriptToBody(captchaStyleName, settings.captchaEndpoint, baseUrl);
-        };
-        
-        // add BotDetect script to body before displaying Captcha html
-        commonFunctions.addScriptToBody(settings.captchaEndpoint, baseUrl, callback);
+        // add BotDetect Init script to body
+        commonFunctions.addInitScriptToBody(captchaStyleName, settings.captchaEndpoint);
       } else {
         throw new Error('An error occurred while getting Captcha html markup.');
       }
@@ -221,6 +185,8 @@
   };
   
   Captcha.init = function(settings) {
+    // add BotDetect script to body before displaying Captcha html
+    commonFunctions.addScriptToBody(settings.captchaEndpoint);
     Captcha.displayHtml(settings);
   };
   
