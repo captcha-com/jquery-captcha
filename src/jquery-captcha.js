@@ -82,8 +82,8 @@
     
     // get botdetect captcha client-side instance
     function _getInstance() {
-      return (window.BotDetect !== undefined) 
-        ? window.BotDetect.getInstanceByStyleName(styleName)
+      return (window.botdetect !== undefined) 
+        ? window.botdetect.getInstanceByStyleName(styleName)
         : null;
     };
     
