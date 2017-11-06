@@ -10,8 +10,8 @@ module.exports = function(grunt) {
       },
       build: {
         files: [{
-          src: 'src/captcha-clientside-workflow.js',
-          dest: 'dist/captcha-clientside-workflow.min.js'
+          src: 'src/jquery-captcha.js',
+          dest: 'dist/jquery-captcha.min.js'
         }]
       }
     }

@@ -1,18 +1,21 @@
 {
-  "name": "captcha-clientside-workflow",
+  "name": "jquery-captcha",
   "version": "1.0.0",
-  "description": "BotDetect Captcha Client side workflow (pure JavaScript / JQuery)",
+  "description": "BotDetect Captcha jQuery Plugin (BotDetect Captcha Simple API integration for all of the jQuery versions)",
   "scripts": {
     "build": "grunt"  
   },
-  "main": "dist/captcha-clientside-workflow.min.js",
+  "main": "dist/jquery-captcha.min.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/captcha-com/captcha-clientside-workflow.git"
+    "url": "git+https://github.com/captcha-com/jquery-captcha.git"
   },
-  "homepage": "https://captcha.com",
+  "homepage": "https://captcha.com/jquery-captcha.html",
   "keywords": [
+    "jquery-captcha",
+    "jquery-plugin",
     "captcha",
+    "captcha-generator",
     "botdetect"
   ],
   "author": "BotDetect Captcha",
