@@ -55,7 +55,7 @@
       });
     };
     
-    // a custom of $.getScript(), which let changing the options
+    // a custom of $.getScript(), which lets changing the options
     function _getScript(url, options) {
       options = $.extend({
         dataType: 'script',
