@@ -10,7 +10,7 @@
     }
 
     if (!settings || !settings.captchaEndpoint) {
-      throw new Error('The captchaEndpoint option is required.');
+      throw new Error('The captchaEndpoint setting is required.');
     }
     
     // normalize captcha endpoint path
