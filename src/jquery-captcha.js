@@ -3,7 +3,9 @@
   
   $.fn.captcha = function(settings) {
     
-    if (this.length === 0) {
+    var element = this;
+    
+    if (element.length === 0) {
       throw new Error('Captcha html element cound not be found.');
     }
 
@@ -14,8 +16,8 @@
     // normalize captcha endpoint path
     settings.captchaEndpoint = settings.captchaEndpoint.replace(/\/+$/g, '');
     
-    var styleName = this.data('stylename') ? this.data('stylename') : 'defaultCaptcha';
-
+    var styleName = element.data('stylename') ? element.data('stylename') : 'defaultCaptcha';
+    
     // get captcha html markup
     function _getHtml() {
       return $.ajax({
@@ -87,21 +89,23 @@
         : null;
     };
     
-    // plugin initialization - we display the captcha html markup in view
-    this.init = function() {
-      var element = this;
+    function _displayHtml() {
       _getHtml(settings.captchaEndpoint, styleName).done(function(captchaHtml) {
         // display captcha html markup
         element.html(captchaHtml.replace(/<script.*<\/script>/g, ''));
         // load botdetect scripts
         _loadScriptIncludes();
-        
       });
-      return this;
+    }
+    
+    // plugin initialization - we display the captcha html markup in view
+    element.init = function() {
+      _displayHtml();
+      return element;
     };
     
     // captcha id for validating captcha at server-side
-    this.getCaptchaId = function() {
+    element.getCaptchaId = function() {
       var instance, id = null;
       if ((instance = _getInstance())) {
         return instance.captchaId;
@@ -110,14 +114,14 @@
     };
     
     // reload new captcha image
-    this.reloadImage = function() {
+    element.reloadImage = function() {
       var instance = _getInstance();
       if (instance) {
         instance.reloadImage();
       }
     };
 
-    return this.init();
+    return element.init();
   };
   
 }(jQuery));
