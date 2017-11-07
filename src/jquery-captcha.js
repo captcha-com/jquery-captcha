@@ -89,7 +89,7 @@
         : null;
     };
     
-	// display captcha html markup in view
+    // display captcha html markup in view
     function _displayHtml() {
       _getHtml(settings.captchaEndpoint, styleName).done(function(captchaHtml) {
         element.html(captchaHtml.replace(/<script.*<\/script>/g, ''));
