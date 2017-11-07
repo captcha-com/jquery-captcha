@@ -89,11 +89,10 @@
         : null;
     };
     
+	// display captcha html markup in view
     function _displayHtml() {
       _getHtml(settings.captchaEndpoint, styleName).done(function(captchaHtml) {
-        // display captcha html markup
         element.html(captchaHtml.replace(/<script.*<\/script>/g, ''));
-        // load botdetect scripts
         _loadScriptIncludes();
       });
     }
