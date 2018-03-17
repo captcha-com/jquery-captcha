@@ -77,9 +77,18 @@
       });
     };
     
+    // use user input blur validation if the input element has data-correct-captcha attribute
+    function _useUserInputBlurValidation() {
+      var instance = _getInstance();
+      if (!instance) { return; }
+      return ($('#' + instance.options.userInputID).attr('data-correct-captcha') !== undefined);
+    };
+    
     // fire the custom event when botdetect scripts are loaded
     function _onLoadScriptsSuccess() {
-      _registerUserInputBlurValidation();
+      if (_useUserInputBlurValidation()) {
+        _registerUserInputBlurValidation();
+      }
     }
     
     // get botdetect captcha client-side instance
