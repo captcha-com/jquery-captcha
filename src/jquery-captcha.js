@@ -69,12 +69,9 @@
     
     // load botdetect scripts and execute them
     function _loadScriptIncludes() {
-      var scriptIncludeUrl = settings.captchaEndpoint + '?get=script-include';
-      _getScript(scriptIncludeUrl, { cache: true }).done(function() {
-        var captchaId = $('#BDC_VCID_' + styleName).val();
-        var initScriptIncludeUrl = settings.captchaEndpoint + '?get=init-script-include&c=' + styleName + '&t=' + captchaId + '&cs=2';
-        _getScript(initScriptIncludeUrl).done(_onLoadScriptsSuccess);
-      });
+      var captchaId = $('#BDC_VCID_' + styleName).val();
+      var scriptIncludeUrl = settings.captchaEndpoint + '?get=script-include&c=' + styleName + '&t=' + captchaId + '&cs=2';
+      _getScript(scriptIncludeUrl).done(_onLoadScriptsSuccess);
     };
     
     // use user input blur validation if the input element has data-correct-captcha attribute
