@@ -90,9 +90,11 @@
     
     // get botdetect captcha client-side instance
     function _getInstance() {
-      return (window.botdetect !== undefined) 
-        ? window.botdetect.getInstanceByStyleName(styleName)
-        : null;
+      var instance = null;
+      if (typeof window.botdetect !== 'undefined') {
+        return window.botdetect.getInstanceByStyleName(styleName);
+      }
+      return instance;
     };
     
     // display captcha html markup in view
