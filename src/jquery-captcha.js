@@ -29,30 +29,38 @@
         }
       });
     };
+
+    // ajax validate captcha
+    function _validateUnSafe(captchaCode, onSuccess) {
+      var instance = _getInstance();
+
+      $.ajax({
+        method: 'GET',
+        url: instance.validationUrl,
+        data: {
+          i: captchaCode
+        },
+        success: function (isCorrect) {
+          onSuccess(isCorrect);
+        }
+      });
+    };
     
     // ajax validate captcha on blur event and trigging the 
     // custom 'validatecaptcha' event to fire the validation result
     function _registerUserInputBlurValidation() {
       var instance = _getInstance();
-      if (!instance) { return; }
-      
+
       $('#' + instance.options.userInputID).on('blur', function() {
         var captchaCode = $.trim($(this).val());
         if (captchaCode.length === 0) { return; }
 
-        var self = this;
-        $.ajax({
-          method: 'GET',
-          url: instance.validationUrl,
-          data: {
-            i: captchaCode
-          },
-          success: function (isCorrect) {
-            if (!isCorrect) {
-              instance.reloadImage();
-            }
-            $(self).trigger('validatecaptcha', [isCorrect]);
+        var userInputID = this;
+        _validateUnSafe(captchaCode, function(isCorrect) {
+          if (!isCorrect) {
+            instance.reloadImage();
           }
+          $(userInputID).trigger('validatecaptcha', [isCorrect]);
         });
       });
     };
@@ -126,6 +134,15 @@
       if (instance) {
         instance.reloadImage();
       }
+    };
+
+    // validate captcha on client-side and execute user callback function on ajax success
+    element.validateUnsafe = function(callback) {
+      var instance = _getInstance();
+      var captchaCode = $.trim($('#' + instance.options.userInputID).val());
+      _validateUnSafe(captchaCode, function(isCorrect) {
+        callback(isCorrect);
+      });
     };
 
     return element.init();
