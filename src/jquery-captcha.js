@@ -85,7 +85,6 @@
     // use user input blur validation if the input element has data-correct-captcha attribute
     function _useUserInputBlurValidation() {
       var instance = _getInstance();
-      if (!instance) { return; }
       return ($('#' + instance.options.userInputID).attr('data-correct-captcha') !== undefined);
     };
     
@@ -121,27 +120,31 @@
     
     // captcha id for validating captcha at server-side
     element.getCaptchaId = function() {
-      var instance, id = null;
-      if ((instance = _getInstance())) {
-        return instance.captchaId;
-      }
-      return id;
+      var instance = _getInstance();
+      return instance.captchaId;
+    };
+
+    // the typed captcha code
+    element.getCaptchaCode = function() {
+      var instance = _getInstance();
+      return instance.userInput.value;
     };
     
     // reload new captcha image
     element.reloadImage = function() {
       var instance = _getInstance();
-      if (instance) {
-        instance.reloadImage();
-      }
+      instance.reloadImage();
     };
 
     // validate captcha on client-side and execute user callback function on ajax success
     element.validateUnsafe = function(callback) {
       var instance = _getInstance();
       var captchaCode = $.trim($('#' + instance.options.userInputID).val());
-      _validateUnSafe(captchaCode, function(isCorrect) {
-        callback(isCorrect);
+      _validateUnSafe(captchaCode, function(isHuman) {
+        callback(isHuman);
+        if (!_useUserInputBlurValidation() && !isHuman) {
+          instance.reloadImage();
+        }
       });
     };
 
