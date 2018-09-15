@@ -31,7 +31,7 @@
     };
 
     // ajax validate captcha
-    function _validateUnSafe(captchaCode, onSuccess) {
+    function _validateUnsafe(captchaCode, onSuccess) {
       var instance = _getInstance();
 
       $.ajax({
@@ -56,7 +56,7 @@
         if (captchaCode.length === 0) { return; }
 
         var userInputID = this;
-        _validateUnSafe(captchaCode, function(isCorrect) {
+        _validateUnsafe(captchaCode, function(isCorrect) {
           if (!isCorrect) {
             instance.reloadImage();
           }
@@ -140,7 +140,7 @@
     element.validateUnsafe = function(callback) {
       var instance = _getInstance();
       var captchaCode = $.trim($('#' + instance.options.userInputID).val());
-      _validateUnSafe(captchaCode, function(isHuman) {
+      _validateUnsafe(captchaCode, function(isHuman) {
         callback(isHuman);
         if (!_useUserInputBlurValidation() && !isHuman) {
           instance.reloadImage();
