@@ -79,7 +79,9 @@
     function _loadScriptIncludes() {
       var captchaId = $('#BDC_VCID_' + styleName).val();
       var scriptIncludeUrl = settings.captchaEndpoint + '?get=script-include&c=' + styleName + '&t=' + captchaId + '&cs=2';
-      _getScript(scriptIncludeUrl).done(_onLoadScriptsSuccess);
+      _getScript(scriptIncludeUrl).done(function() {
+        setTimeout(_onLoadScriptsSuccess, 200);
+      });
     };
     
     // use user input blur validation if the input element has data-correct-captcha attribute
