@@ -10,23 +10,36 @@ npm install jquery-captcha --save
 ```html
 <script src="node_modules/jquery-captcha/dist/jquery-captcha.min.js"></script>
 ```
-##### 3) Load Captcha jQuery Plugin in Your App
-- Java Captcha endpoint:
+##### 3) Load Captcha jQuery Plugin in Your App, and configure backend Captcha endpoint
+
+Endpoint Configuration depends on which technology you use in the backend.
+
+- ASP.NET-based Captcha endpoint:
 ```js
 $(document).ready(function() {
     // DOM ready
     var captcha = $('#botdetect-captcha').captcha({
-      captchaEndpoint: '/botdetect-java-captcha-api-path-at-server-side/botdetectcaptcha'
+      captchaEndpoint: 'captcha-endpoint/BotDetectCaptcha.ashx'
     });
 });
 ```
 
-- PHP Captcha endpoint:
+- Java-based Captcha endpoint:
 ```js
 $(document).ready(function() {
     // DOM ready
     var captcha = $('#botdetect-captcha').captcha({
-      captchaEndpoint: '/botdetect-php-captcha-api-path-at-server-side/simple-botdetect.php'
+      captchaEndpoint: 'captcha-endpoint/botdetectcaptcha'
+    });
+});
+```
+
+- PHP-based Captcha endpoint:
+```js
+$(document).ready(function() {
+    // DOM ready
+    var captcha = $('#botdetect-captcha').captcha({
+      captchaEndpoint: 'captcha-endpoint/simple-botdetect.php'
     });
 });
 ```
@@ -79,9 +92,21 @@ $('#captchaCode').on('validatecaptcha', function(event, isCorrect) {
 ```
 
 ##### 6) Validate Captcha on the Server-side
-These client-side captcha validations are just an UI usability improvement that you may use or not -- they do not protect your form from spammers at all.
+These client-side captcha validations are just an usability improvement that you may use or not -- they do not protect your form from spammers at all.
 
 As you are protecting some server-side action you must validate a Captcha at the server-side before executing that protected action.
+
+- Server-side Captcha validation with [ASP.NET Captcha](https://captcha.com/asp.net-captcha.html#simple-api) looks in this way:
+```csharp
+// C#
+SimpleCaptcha captcha = new SimpleCaptcha();
+bool isHuman = captcha.Validate(captchaCode, captchaId);
+```
+```vbnet
+' VB.NET
+Dim captcha As SimpleCaptcha = New SimpleCaptcha()
+Dim isHuman As Boolean = captcha.Validate(captchaCode, captchaId)
+```
 
 - Server-side Captcha validation with [Java Captcha](https://captcha.com/java-captcha.html#simple-api) looks in this way:
 ```java
@@ -106,7 +131,7 @@ $isHuman = $captcha->Validate($captchaCode, $captchaId);
 
 
 ### Dependencies:
-Captcha jQuery plugin uses Captcha library for Captcha image and Captcha sound generation. At the moment challenges are generated in Java backend with [BotDetect Java Captcha library](https://captcha.com/java-captcha.html#simple-api) and PHP backend with [BotDetect PHP Captcha library](https://captcha.com/php-captcha.html#simple-api), but BotDetect ASP.NET is going to work with Captcha jQuery plugin soon as well.
+BotDetect Captcha jQuery Plugin requires [BotDetect ASP.NET Captcha](https://captcha.com/asp.net-captcha.html#simple-api), [BotDetect Java Captcha](https://captcha.com/java-captcha.html#simple-api) or [BotDetect PHP Captcha](https://captcha.com/php-captcha.html#simple-api) library to generate Captcha challenges. Simple API support for ASP.NET Core and .NET Core will be released this month -- very likely during the week of 2018/11/19-25. See our [roadmap](https://captcha.com/captcha-roadmap-and-release-notes.html#aspnet-release-notes) for details.
 
 
 ### Technical Support:
