@@ -16,7 +16,26 @@
     // normalize captcha endpoint path
     settings.captchaEndpoint = settings.captchaEndpoint.replace(/\/+$/g, '');
     
-    var styleName = element.data('stylename') ? element.data('stylename') : 'defaultCaptcha';
+    var captchaStyleName = _getCaptchaStyleName();
+  
+    // get captcha style name
+    function _getCaptchaStyleName() {
+      var styleName;
+
+      styleName = element.data('captchastylename');
+      if (styleName) {
+        return styleName;
+      }
+
+      // backward compatibility
+      styleName = element.data('stylename');
+      if (styleName) {
+        return styleName;
+      }
+
+      styleName = 'defaultCaptcha';
+      return styleName;
+    };
     
     // get captcha html markup
     function _getHtml() {
@@ -25,7 +44,7 @@
         url: settings.captchaEndpoint,
         data: {
           get: 'html',
-          c: styleName
+          c: captchaStyleName
         }
       });
     };
@@ -77,8 +96,8 @@
     
     // load botdetect scripts and execute them
     function _loadScriptIncludes() {
-      var captchaId = $('#BDC_VCID_' + styleName).val();
-      var scriptIncludeUrl = settings.captchaEndpoint + '?get=script-include&c=' + styleName + '&t=' + captchaId + '&cs=2';
+      var captchaId = $('#BDC_VCID_' + captchaStyleName).val();
+      var scriptIncludeUrl = settings.captchaEndpoint + '?get=script-include&c=' + captchaStyleName + '&t=' + captchaId + '&cs=2';
       _getScript(scriptIncludeUrl).done(function() {
         setTimeout(_onLoadScriptsSuccess, 200);
       });
@@ -101,14 +120,14 @@
     function _getInstance() {
       var instance = null;
       if (typeof window.botdetect !== 'undefined') {
-        return window.botdetect.getInstanceByStyleName(styleName);
+        return window.botdetect.getInstanceByStyleName(captchaStyleName);
       }
       return instance;
     };
     
     // display captcha html markup in view
     function _displayHtml() {
-      _getHtml(settings.captchaEndpoint, styleName).done(function(captchaHtml) {
+      _getHtml(settings.captchaEndpoint, captchaStyleName).done(function(captchaHtml) {
         element.html(captchaHtml.replace(/<script.*<\/script>/g, ''));
         _loadScriptIncludes();
       });
