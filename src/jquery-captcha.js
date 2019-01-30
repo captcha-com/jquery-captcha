@@ -145,10 +145,15 @@
       return instance.captchaId;
     };
 
-    // the typed captcha code
+    // get the user entered captcha code
+    // keep this function for backward compatibility
     element.getCaptchaCode = function() {
       var instance = _getInstance();
       return instance.userInput.value;
+    };
+
+    element.getUserEnteredCaptchaCode = function() {
+      return element.getCaptchaCode();
     };
     
     // reload new captcha image
