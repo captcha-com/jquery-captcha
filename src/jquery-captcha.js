@@ -33,8 +33,7 @@
         return styleName;
       }
 
-      styleName = 'defaultCaptcha';
-      return styleName;
+      throw new Error('The data-captchastylename attribute is not found or its value is not set.');
     };
     
     // get captcha html markup
