@@ -123,11 +123,47 @@
       }
       return instance;
     };
+
+    // get captcha endpoint handler from configued captchaEndpoint value,
+    // the result can be "simple-captcha-endpoint.ashx", "botdetectcaptcha",
+    // or "simple-botdetect.php"
+    function _getCaptchaEndpointHandler() {
+      var splited = settings.captchaEndpoint.split('/');
+      return splited[splited.length - 1];
+    };
+
+    // get backend base url from configued captchaEndpoint value
+    function _getBackendBaseUrl(captchaEndpointHandler) {
+      var lastIndex = settings.captchaEndpoint.lastIndexOf(captchaEndpointHandler);
+      return settings.captchaEndpoint.substring(0, lastIndex);
+    };
+
+    // change relative to absolute urls in captcha html markup
+    function _changeRelativeToAbsoluteUrls(originCaptchaHtml) {
+      var captchaEndpointHandler = _getCaptchaEndpointHandler();
+      var backendUrl = _getBackendBaseUrl(captchaEndpointHandler);
+
+      originCaptchaHtml = originCaptchaHtml.replace(/<script.*<\/script>/g, '');
+      var relativeUrls = originCaptchaHtml.match(/(src|href)=\"([^"]+)\"/g);
+      
+      var relativeUrl, relativeUrlPrefixPattern, absoluteUrl,
+          changedCaptchaHtml = originCaptchaHtml;
+
+      for (var i = 0; i < relativeUrls.length; i++) {
+        relativeUrl = relativeUrls[i].slice(0, -1).replace(/src=\"|href=\"/, '');
+        relativeUrlPrefixPattern = new RegExp(".*" + captchaEndpointHandler);
+        absoluteUrl = relativeUrl.replace(relativeUrlPrefixPattern, backendUrl + captchaEndpointHandler);
+        changedCaptchaHtml = changedCaptchaHtml.replace(relativeUrl, absoluteUrl);
+      }
+
+      return changedCaptchaHtml;
+    };
     
     // display captcha html markup in view
     function _displayHtml() {
       _getHtml(settings.captchaEndpoint, captchaStyleName).done(function(captchaHtml) {
-        element.html(captchaHtml.replace(/<script.*<\/script>/g, ''));
+        captchaHtml = _changeRelativeToAbsoluteUrls(captchaHtml) ;
+        element.html(captchaHtml);
         _loadScriptIncludes();
       });
     }
