@@ -1,6 +1,6 @@
 {
   "name": "jquery-captcha",
-  "version": "2.3.1",
+  "version": "2.3.2",
   "description": "BotDetect Captcha jQuery Plugin (BotDetect Captcha Simple API integration for all of the jQuery versions)",
   "scripts": {
     "build": "grunt"  
