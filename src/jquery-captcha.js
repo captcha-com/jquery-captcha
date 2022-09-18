@@ -96,7 +96,7 @@
     // load botdetect scripts and execute them
     function _loadScriptIncludes() {
       var captchaId = $('#BDC_VCID_' + captchaStyleName).val();
-      var scriptIncludeUrl = settings.captchaEndpoint + '?get=script-include&c=' + captchaStyleName + '&t=' + captchaId + '&cs=2';
+      var scriptIncludeUrl = settings.captchaEndpoint + (settings.captchaEndpoint.indexOf('?') == -1 ? '?' : '&') + 'get=script-include&c=' + captchaStyleName + '&t=' + captchaId + '&cs=2';
       _getScript(scriptIncludeUrl).done(function() {
         setTimeout(_onLoadScriptsSuccess, 200);
       });
