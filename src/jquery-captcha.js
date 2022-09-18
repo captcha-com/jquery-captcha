@@ -148,13 +148,13 @@
       
       var relativeUrl, relativeUrlPrefixPattern, absoluteUrl,
           changedCaptchaHtml = originCaptchaHtml;
-
-      for (var i = 0; i < relativeUrls.length; i++) {
-        relativeUrl = relativeUrls[i].slice(0, -1).replace(/src=\"|href=\"/, '');
-        relativeUrlPrefixPattern = new RegExp(".*" + captchaEndpointHandler);
-        absoluteUrl = relativeUrl.replace(relativeUrlPrefixPattern, backendUrl + captchaEndpointHandler);
-        changedCaptchaHtml = changedCaptchaHtml.replace(relativeUrl, absoluteUrl);
-      }
+			var captchaEndpointHandlerWithSeparator = backendUrl + captchaEndpointHandler + (captchaEndpointHandler.indexOf('?') == -1 ? '?' : '&')
+			for (var i = 0; i < relativeUrls.length; i++) {
+				relativeUrl = relativeUrls[i].slice(0, -1).replace(/src=\"|href=\"/, '');
+				relativeUrlPrefixPattern = "/api/simple-captcha-endpoint?";
+				absoluteUrl = relativeUrl.replace(relativeUrlPrefixPattern, captchaEndpointHandlerWithSeparator);
+				changedCaptchaHtml = changedCaptchaHtml.replace(relativeUrl, absoluteUrl);
+			}
 
       return changedCaptchaHtml;
     };
